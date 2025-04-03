@@ -9,6 +9,9 @@ mod pico;
 mod program;
 mod types;
 
+#[cfg(test)]
+mod tests;
+
 // Publicly export key types, errors, context, and job functions
 pub use context::ServiceContext;
 pub use errors::ProofServiceError;

@@ -21,9 +21,11 @@ url = { workspace = true }
 hex = { workspace = true }
 futures = { workspace = true }
 pico-sdk = { workspace = true, features = ["coprocessor"] }
+pico-vm = { workspace = true }
 serde_json = { workspace = true }
 reqwest = { workspace = true, features = ["stream"] }
 tempfile.workspace = true
+rand = "0.8"
 
 [dev-dependencies]
 blueprint-sdk = { workspace = true, features = ["testing", "tangle"] }

@@ -17,7 +17,7 @@ use tempfile::TempDir; // To manage temporary directories
 
 // Wrapper struct to hold temporary resources and ensure cleanup
 struct ProofResources {
-    _elf_temp_dir: TempDir, // Holds the temp dir containing the ELF, cleans up on drop
+    elf_temp_dir: TempDir, // Holds the temp dir containing the ELF, cleans up on drop
     elf_path: PathBuf,
     output_temp_dir: TempDir, // Holds the temp dir for proof outputs, cleans up on drop
     output_path: PathBuf,
@@ -85,7 +85,7 @@ pub async fn generate_proof(
     // Wrap resources for automatic cleanup
     let _resources = ProofResources {
         // Variable binding ensures it lives long enough
-        _elf_temp_dir: elf_temp_dir,      // Transfer ownership
+        elf_temp_dir,                     // Transfer ownership
         elf_path: elf_path.clone(),       // Clone path for use
         output_temp_dir,                  // Transfer ownership
         output_path: output_path.clone(), // Clone path for use

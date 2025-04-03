@@ -35,3 +35,4 @@ reqwest = "0.12.15"
 tempfile = "3.13"
 
 pico-sdk = { git = "https://github.com/brevis-network/pico", features = ["coprocessor"] }
+pico-vm = { git = "https://github.com/brevis-network/pico" }

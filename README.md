@@ -1,84 +1,65 @@
-# <h1 align="center">Hello World Tangle Blueprint 🌐</h1>
+# Pico Verifiable Computation Service - Tangle Blueprint
 
-## 📚 Overview
+This project implements a reusable Tangle Blueprint that provides Verifiable Computation as a Service, powered by the [Pico zkVM](https://github.com/brevis-network/pico).
 
-This Tangle Blueprint provides a simple Hello World job.
-Blueprints are specifications for <abbr title="Actively Validated Services">AVS</abbr>s on the Tangle Network. An AVS is
-an off-chain service that runs arbitrary computations for a user-specified period of time.
+## Overview
 
-Blueprints provide a useful abstraction, allowing developers to create reusable service infrastructures as if they were
-smart contracts. This enables developers to monetize their work and align long-term incentives with the success of their
-creations, benefiting proportionally to their Blueprint's usage.
+The service allows developers to submit arbitrary RISC-V programs (compiled for the Pico zkVM) along with their inputs and receive Zero-Knowledge Proofs (ZKPs) of the execution trace. This enables trustless verification of computations performed off-chain.
 
-For more details, please refer to the [project documentation](https://docs.tangle.tools/developers/blueprints/introduction).
+Key Features:
 
-## 🚀 Features
+- **Generic Computation:** Supports proving arbitrary RISC-V programs compatible with Pico.
+- **On-Chain Program Registry:** Uses an EVM smart contract (`ProgramRegistry.sol`) to store program metadata (SHA256 hash and download location - e.g., IPFS, HTTPS), enabling program reuse and discovery.
+- **Flexible Proving:** Supports different proving modes via the Pico SDK:
+  - `Fast`: RISC-V execution proof only (for testing/debugging, **not secure**).
+  - `Full`: Complete recursive STARK proof generation.
+  - `FullWithEvm`: Generates a Groth16 proof verifiable on EVM chains using generated Solidity verifiers.
+- **Tangle Blueprint Integration:** Built using the [Tangle Blueprint SDK](https://github.com/TangleLabs/blueprint-sdk), allowing the service to run as a decentralized backend service within the Tangle network ecosystem. Jobs can be triggered via Tangle messages.
+- **Decentralized Storage:** Program binaries are intended to be stored off-chain (e.g., IPFS, Arweave, HTTPS), referenced by the on-chain registry.
 
-- Custom greeting messages
-- Default "Hello World!" messages
-- ...
+## Architecture
 
-## 📋 Prerequisites
+1.  **Tangle Blueprint Runner (`bin/`):** The main service executable that runs the Blueprint. It listens for incoming job requests (e.g., from the Tangle network).
+2.  **Core Logic Library (`lib/`):** Contains the Rust implementation of the service:
+    - **Jobs:** Defines the available service functions (`say_hello` example, `generate_proof` core job).
+    - **Context:** Manages shared resources like HTTP clients and EVM provider configurations.
+    - **EVM Interaction:** Handles communication with the `ProgramRegistry` smart contract using `alloy`.
+    - **Program Handling:** Fetches program ELF binaries from specified locations (URL, local path) and verifies their integrity using SHA256 hashes.
+    - **Pico Integration:** Uses the `pico-sdk` to load ELFs, provide inputs, and execute the different proving flows (`prove_fast`, `prove`, `prove_evm`).
+    - **Types & Errors:** Defines data structures for requests, results, and custom errors.
+3.  **Program Registry Contract (`contracts/`):** A Solidity smart contract (`ProgramRegistry.sol`) deployed on an EVM-compatible chain. It stores `programHash -> {location, owner}` mappings.
+4.  **Program Storage (External):** A separate system (e.g., IPFS, web server) hosts the actual program ELF binaries.
 
-Before you can run this project, you will need to have the following software installed on your machine:
+## Workflow
 
-- [Rust](https://www.rust-lang.org/tools/install)
-- [Forge](https://getfoundry.sh)
+1.  **Program Registration (Developer):**
+    - Compile RISC-V code to a Pico zkVM ELF binary.
+    - Calculate the SHA256 hash of the ELF file.
+    - Upload the ELF file to a persistent storage location (e.g., IPFS) and get its URI/URL.
+    - Call the `registerProgram` function on the `ProgramRegistry` smart contract with the program hash and location URI.
+2.  **Proof Request (User/Application):**
+    - Construct a `ProofRequest` containing:
+      - `program_hash`: The hash of the registered program to execute.
+      - `inputs`: Hex-encoded input data for the program.
+      - `proving_type`: `Fast`, `Full`, or `FullWithEvm`.
+      - Optional overrides for program location or EVM configuration.
+    - Submit the `ProofRequest` as a job call to the running Tangle Blueprint service (e.g., via a Tangle message targeting the service ID and `GENERATE_PROOF_JOB_ID`).
+3.  **Proof Generation (Service):**
+    - The Blueprint Runner receives the job call.
+    - The `generate_proof` job function executes:
+      - Retrieves the program location from the `ProgramRegistry` contract (unless overridden).
+      - Downloads the ELF binary from the location.
+      - Verifies the downloaded ELF hash against the requested `program_hash`.
+      - Initializes the Pico `DefaultProverClient` (KoalaBear).
+      - Executes the requested proving type (`prove_fast`, `prove`, or `prove_evm`).
+      - For `prove_evm`, runs external Docker commands via the SDK to generate the final Groth16 proof and EVM verifier inputs.
+      - Parses and collects the proof data and public values.
+    - Returns the `ProofResult` (containing proof data, public values, etc.) back through the Blueprint SDK (e.g., as a response Tangle message).
 
-You will also need to install [cargo-tangle](https://crates.io/crates/cargo-tangle), our CLI tool for creating and
-deploying Tangle Blueprints:
+## Setup & Usage
 
-To install the Tangle CLI, run the following command:
+_(TODO: Add instructions on how to build, configure (environment variables for RPC URL, registry address, etc.), deploy the contract, and run the blueprint service.)_
 
-> Supported on Linux, MacOS, and Windows (WSL2)
+## Development
 
-```bash
-cargo install cargo-tangle --git https://github.com/tangle-network/blueprint
-```
-
-## ⭐ Getting Started
-
-Once `cargo-tangle` is installed, you can create a new project with the following command:
-
-```sh
-cargo tangle blueprint create --name <project-name>
-```
-
-and follow the instructions to create a new project.
-
-## 🛠️ Development
-
-Once you have created a new project, you can run the following command to start the project:
-
-```sh
-cargo build
-```
-
-to build the project, and
-
-```sh
-cargo tangle blueprint deploy
-```
-
-to deploy the blueprint to the Tangle network.
-
-## 📜 License
-
-Licensed under either of
-
-* Apache License, Version 2.0
-  ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license
-  ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
-
-## 📬 Feedback and Contributions
-
-We welcome feedback and contributions to improve this blueprint.
-Please open an issue or submit a pull request on our GitHub repository.
-Please let us know if you fork this blueprint and extend it too!
-
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual licensed as above, without any additional terms or conditions.
+_(TODO: Add details on building the code, running tests, contributing guidelines.)_
