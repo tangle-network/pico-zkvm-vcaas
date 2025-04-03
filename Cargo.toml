@@ -1,0 +1,37 @@
+[workspace]
+resolver = "2"
+members = ["pico-coprocessor-service-lib", "pico-coprocessor-service-bin"]
+
+[workspace.package]
+version = "0.1.0"
+description = "A Tangle Blueprint for a verifiable compute service using Pico zkvm"
+edition = "2024"
+authors = ["Drew Stone <drewstone329@gmail.com>"]
+license = "MIT OR Apache-2.0"
+homepage = "https://tangle.tools"
+repository = "https://github.com/tangle-network/pico-coprocessor-service"
+readme = "README.md"
+categories = ["cryptography", "cryptography::cryptocurrencies"]
+keywords = ["tangle", "blueprint", "avs"]
+
+[workspace.dependencies]
+pico-coprocessor-service-blueprint-lib = { path = "pico-coprocessor-service-lib" }
+
+blueprint-sdk = { git = "https://github.com/tangle-network/blueprint.git", default-features = false }
+tokio = { version = "1.43.0", default-features = false }
+color-eyre = "0.6.3"
+tower = { version = "0.5.2", default-features = false }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+tracing = "0.1.41"
+
+sha2 = "0.10.8"
+thiserror = "2.0.12"
+serde = "1.0.219"
+url = "2.5.4"
+hex = "0.4.3"
+futures = "0.3.31"
+serde_json = "1.0.140"
+reqwest = "0.12.15"
+tempfile = "3.13"
+
+pico-sdk = { git = "https://github.com/brevis-network/pico", features = ["coprocessor"] }
