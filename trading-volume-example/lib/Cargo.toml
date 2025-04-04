@@ -1,0 +1,11 @@
+[package]
+name = "trading-volumn-lib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+coprocessor-sdk.workspace = true
+crypto-bigint.workspace = true
+hex = "0.4"
+pico-sdk = { workspace = true, features = ["coprocessor"]}
+serde.workspace = true

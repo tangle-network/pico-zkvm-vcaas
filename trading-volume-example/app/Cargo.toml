@@ -1,0 +1,12 @@
+[package]
+name = "example-trading-volumn"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+alloy-sol-types = { workspace = true }
+coprocessor-sdk = { workspace = true }
+crypto-bigint.workspace = true
+hex = "0.4"
+trading-volumn-lib ={ path = "../lib" }
+pico-sdk = { workspace = true, features = ["coprocessor"]}

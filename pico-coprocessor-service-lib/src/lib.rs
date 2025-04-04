@@ -15,7 +15,23 @@ mod tests;
 // Publicly export key types, errors, context, and job functions
 pub use context::ServiceContext;
 pub use errors::ProofServiceError;
-pub use jobs::generate_proof;
-pub use types::{ProgramLocation, ProofRequest, ProofResult, ProvingType};
+// Export new job function and request type
+pub use jobs::{generate_coprocessor_proof, generate_proof};
+// Export new request type
+pub use types::{
+    BlockchainData,
+    CoprocessorProofRequest,
+    MaxSizes, // Export new types
+    ProgramLocation,
+    ProofRequest,
+    ProofResult,
+    ProvingType,
+    SerializableLog,
+    SerializableReceipt,
+    SerializableStorageSlot,
+    SerializableTransaction, // Export data types
+};
 
+// Define Job IDs
 pub const GENERATE_PROOF_JOB_ID: u32 = 1;
+pub const GENERATE_COPROCESSOR_PROOF_JOB_ID: u32 = 2; // New Job ID

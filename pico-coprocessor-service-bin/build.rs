@@ -1,8 +1,8 @@
 use blueprint_sdk::build;
 use blueprint_sdk::tangle::blueprint;
+use pico_coprocessor_service_blueprint_lib::{generate_coprocessor_proof, generate_proof};
 use std::path::Path;
 use std::process;
-use pico_coprocessor_service_blueprint_lib::say_hello;
 
 fn main() {
     // Automatically update dependencies with `soldeer` (if available), and build the contracts.
@@ -22,7 +22,7 @@ fn main() {
         name: "experiment",
         master_manager_revision: "Latest",
         manager: { Evm = "HelloBlueprint" },
-        jobs: [say_hello]
+        jobs: [generate_proof, generate_coprocessor_proof]
     };
 
     match blueprint {
@@ -31,12 +31,12 @@ fn main() {
             let json = blueprint_sdk::tangle::metadata::macros::ext::serde_json::to_string_pretty(
                 &blueprint,
             )
-                .unwrap();
+            .unwrap();
             std::fs::write(
                 Path::new(env!("CARGO_WORKSPACE_DIR")).join("blueprint.json"),
                 json.as_bytes(),
             )
-                .unwrap();
+            .unwrap();
         }
         Err(e) => {
             println!("cargo::error={e:?}");

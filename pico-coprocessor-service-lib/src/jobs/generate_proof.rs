@@ -26,7 +26,7 @@ struct ProofResources {
 pub async fn generate_proof(
     Context(ctx): Context<ServiceContext>,
     TangleArg(request): TangleArg<ProofRequest>,
-) -> TangleResult<Result<ProofResult, ProofServiceError>> {
+) -> Result<TangleResult<ProofResult>, ProofServiceError> {
     info!(request = ?request, "Received generate_proof job request");
 
     // --- 1. Preparation ---
@@ -39,7 +39,7 @@ pub async fn generate_proof(
                 request.program_hash
             ));
             error!("{}", err);
-            return TangleResult(Err(err));
+            return Err(err);
         }
     };
 
@@ -50,7 +50,7 @@ pub async fn generate_proof(
             request.inputs
         ));
         error!("{}", err);
-        return TangleResult(Err(err));
+        return Err(err);
     }
 
     // Create a temporary directory for proof outputs for this specific job
@@ -65,7 +65,7 @@ pub async fn generate_proof(
                 e
             ));
             error!("{}", err);
-            return TangleResult(Err(err));
+            return Err(err);
         }
     };
     let output_path = output_temp_dir.path().to_path_buf();
@@ -78,7 +78,7 @@ pub async fn generate_proof(
             error!("Failed to get program ELF: {:?}", e);
             // Cleanup output dir if program fetch failed
             let _ = tokio::fs::remove_dir_all(output_path).await;
-            return TangleResult(Err(e));
+            return Err(e);
         }
     };
 
@@ -109,12 +109,12 @@ pub async fn generate_proof(
             // proof_result.inputs = request.inputs; // Already set inside execute_pico_prove
 
             info!(result = ?proof_result, "Proof generation successful");
-            TangleResult(Ok(proof_result))
+            Ok(TangleResult(proof_result))
         }
         Err(e) => {
             error!("Proof generation failed: {:?}", e);
             // Temp dirs (_elf_temp_dir, output_temp_dir) are cleaned up automatically when _resources goes out of scope
-            TangleResult(Err(e))
+            Err(e)
         }
     }
 }

@@ -33,6 +33,9 @@ futures = "0.3.31"
 serde_json = "1.0.140"
 reqwest = "0.12.15"
 tempfile = "3.13"
+rand = "0.8"
 
+parity-scale-codec = { version = "3", features = ["derive"] }
 pico-sdk = { git = "https://github.com/brevis-network/pico", features = ["coprocessor"] }
 pico-vm = { git = "https://github.com/brevis-network/pico" }
+coprocessor-sdk = { git = "https://github.com/brevis-network/Pico-zkCoprocessor" }

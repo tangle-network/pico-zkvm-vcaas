@@ -1,7 +1,7 @@
 // tests/integration_tests.rs
 use crate::{
-    GENERATE_PROOF_JOB_ID, ProgramLocation, ProofRequest, ProofServiceError, ProvingType,
-    ServiceContext, generate_proof,
+    GENERATE_PROOF_JOB_ID, ProgramLocation, ProofRequest, ProofResult, ProofServiceError,
+    ProvingType, ServiceContext, generate_proof,
 };
 use blueprint_sdk::{
     alloy::primitives::Address,
@@ -42,11 +42,11 @@ async fn test_generate_proof_job_invalid_hash() {
     let tangle_arg = TangleArg(request);
     let job_context = Context(ctx);
 
-    let result: TangleResult<Result<_, ProofServiceError>> =
+    let result: Result<TangleResult<ProofResult>, ProofServiceError> =
         generate_proof(job_context, tangle_arg).await;
 
-    assert!(result.0.is_err());
-    match result.0.err().unwrap() {
+    assert!(result.is_err());
+    match result.err().unwrap() {
         ProofServiceError::InvalidInput(msg) => {
             assert!(msg.contains("Invalid program_hash format"));
         }
