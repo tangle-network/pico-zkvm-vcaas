@@ -18,7 +18,7 @@ keywords = ["tangle", "blueprint", "avs"]
 pico-coprocessor-service-blueprint-lib = { path = "pico-coprocessor-service-lib" }
 
 blueprint-sdk = { git = "https://github.com/tangle-network/blueprint.git", default-features = false }
-tokio = { version = "1.43.0", default-features = false }
+tokio = { version = "1.45.1", default-features = false }
 color-eyre = "0.6.3"
 tower = { version = "0.5.2", default-features = false }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
